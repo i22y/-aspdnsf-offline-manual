@@ -1,7 +1,8 @@
 (function () {
   'use strict';
 
-  const BUILD = '2026.07.19-devdocs-2';
+  const BUILD = '2026.07.19-devdocs-3';
+  const MOBILE_BREAKPOINT = 900;
   const RAW_BASE = 'https://raw.githubusercontent.com/i22y/-aspdnsf-offline-manual/modern-reader/';
   let nextId = 1;
 
@@ -10,6 +11,8 @@
     activePath: 'welcome.htm',
     flat: [],
     byPath: new Map(),
+    collapsed: new Set(),
+    mobileDefaultsApplied: false,
     textSize: readTextSize(),
     loadToken: 0
   };
@@ -23,6 +26,10 @@
     } catch (_error) {
       return 16;
     }
+  }
+
+  function isMobile() {
+    return window.matchMedia('(max-width: ' + MOBILE_BREAKPOINT + 'px)').matches;
   }
 
   function decodeTitle(value) {
@@ -90,7 +97,11 @@
       previous: document.getElementById('previousPage'),
       next: document.getElementById('nextPage'),
       original: document.getElementById('originalLink'),
-      article: document.getElementById('article')
+      article: document.getElementById('article'),
+      menuButton: document.getElementById('menuButton'),
+      closeMenuButton: document.getElementById('closeMenuButton'),
+      scrim: document.getElementById('menuScrim'),
+      contents: document.getElementById('contentsPanel')
     };
   }
 
@@ -120,6 +131,28 @@
     }[character]));
   }
 
+  function applyMobileCollapseDefaults() {
+    if (!isMobile() || state.mobileDefaultsApplied) return;
+    state.collapsed.clear();
+
+    function collapseBranches(item) {
+      if (item.children.length) state.collapsed.add(item.id);
+      item.children.forEach(collapseBranches);
+    }
+
+    state.root.children.forEach(collapseBranches);
+    state.mobileDefaultsApplied = true;
+    expandActiveTrail(state.byPath.get(state.activePath));
+  }
+
+  function expandActiveTrail(item) {
+    let current = item;
+    while (current) {
+      state.collapsed.delete(current.id);
+      current = current.parent;
+    }
+  }
+
   function renderTree() {
     const el = elements();
 
@@ -128,9 +161,31 @@
       list.className = 'tree-list';
 
       items.forEach(item => {
+        const hasChildren = item.children.length > 0;
+        const isCollapsed = hasChildren && state.collapsed.has(item.id);
         const li = document.createElement('li');
-        li.className = 'tree-item' + (item.children.length ? ' has-children' : '');
+        li.className = 'tree-item' + (hasChildren ? ' has-children' : '') + (isCollapsed ? ' is-collapsed' : '');
         li.dataset.topicId = item.id;
+
+        const row = document.createElement('div');
+        row.className = 'tree-row';
+
+        if (hasChildren) {
+          const toggle = document.createElement('button');
+          toggle.type = 'button';
+          toggle.className = 'tree-toggle';
+          toggle.setAttribute('aria-expanded', String(!isCollapsed));
+          toggle.setAttribute('aria-controls', item.id + '-children');
+          toggle.setAttribute('aria-label', (isCollapsed ? 'Expand ' : 'Collapse ') + (item.title || 'section'));
+          toggle.dataset.toggleTopic = item.id;
+          toggle.innerHTML = '<span aria-hidden="true">›</span>';
+          row.appendChild(toggle);
+        } else {
+          const spacer = document.createElement('span');
+          spacer.className = 'tree-toggle-spacer';
+          spacer.setAttribute('aria-hidden', 'true');
+          row.appendChild(spacer);
+        }
 
         const label = item.link ? document.createElement('a') : document.createElement('span');
         label.className = (item.link ? 'tree-link' : 'tree-label') + (item.path === state.activePath ? ' active' : '');
@@ -139,11 +194,18 @@
         if (item.link) {
           label.href = makePageHash(item.link);
           label.dataset.manualPath = item.link;
-          label.addEventListener('click', handleManualPageClick);
         }
 
-        li.appendChild(label);
-        if (item.children.length) li.appendChild(renderItems(item.children));
+        row.appendChild(label);
+        li.appendChild(row);
+
+        if (hasChildren) {
+          const children = renderItems(item.children);
+          children.id = item.id + '-children';
+          children.hidden = isCollapsed;
+          li.appendChild(children);
+        }
+
         list.appendChild(li);
       });
 
@@ -152,6 +214,12 @@
 
     el.tree.replaceChildren(renderItems(state.root.children));
     el.topicCount.textContent = state.flat.length + ' topics';
+  }
+
+  function toggleTreeItem(id) {
+    if (state.collapsed.has(id)) state.collapsed.delete(id);
+    else state.collapsed.add(id);
+    renderTree();
   }
 
   function renderSearchResults() {
@@ -176,7 +244,6 @@
       link.href = makePageHash(item.link);
       link.dataset.manualPath = item.link;
       link.textContent = item.trail.map(part => part.title).filter(Boolean).join(' / ');
-      link.addEventListener('click', handleManualPageClick);
       li.appendChild(link);
       el.resultsList.appendChild(li);
     });
@@ -189,12 +256,6 @@
     return '#page=' + encodeURIComponent(path);
   }
 
-  function handleManualPageClick(event) {
-    event.preventDefault();
-    const path = event.currentTarget.dataset.manualPath;
-    location.hash = 'page=' + encodeURIComponent(path);
-  }
-
   function currentFromHash() {
     const params = new URLSearchParams(location.hash.replace(/^#/, ''));
     return normalizePath(params.get('page') || 'welcome.htm') || 'welcome.htm';
@@ -205,6 +266,7 @@
     const item = state.byPath.get(requested) || null;
     const exactPath = item ? item.link : requested;
     state.activePath = requested;
+    expandActiveTrail(item);
 
     renderTree();
     renderBreadcrumbs(item, requested);
@@ -221,7 +283,6 @@
     home.href = makePageHash('welcome.htm');
     home.dataset.manualPath = 'welcome.htm';
     home.textContent = 'docs';
-    home.addEventListener('click', handleManualPageClick);
     el.appendChild(home);
 
     if (!item) {
@@ -238,7 +299,6 @@
         link.href = makePageHash(part.link);
         link.dataset.manualPath = part.link;
         link.textContent = part.title;
-        link.addEventListener('click', handleManualPageClick);
         span.appendChild(link);
       } else {
         span.textContent = part.title;
@@ -265,7 +325,6 @@
     anchor.href = makePageHash(item.link);
     anchor.dataset.manualPath = item.link;
     anchor.innerHTML = '<small>' + label + '</small><span>' + escapeHtml(item.title) + '</span>';
-    anchor.onclick = handleManualPageClick;
   }
 
   async function loadArticle(path, item) {
@@ -329,7 +388,7 @@
         const response = await fetch(attempt.url, { cache: 'no-store', credentials: 'omit' });
         if (!response.ok) throw new Error('HTTP ' + response.status);
         const html = await response.text();
-        if (!html || /<title>\s*Page not found\s*<\/title>/i.test(html)) throw new Error('Page-not-found response');
+        if (!html || /<title>\s*(Page not found|404)\s*<\/title>/i.test(html)) throw new Error('Page-not-found response');
         return { html, url: attempt.url, fallback: attempt.fallback };
       } catch (error) {
         errors.push(attempt.url + ' (' + error.message + ')');
@@ -463,9 +522,49 @@
     try { localStorage.setItem('manualTextSize', String(state.textSize)); } catch (_error) { /* storage can be unavailable */ }
   }
 
+  function openMenu() {
+    const el = elements();
+    document.body.classList.add('nav-open');
+    el.menuButton.setAttribute('aria-expanded', 'true');
+    el.contents.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(() => el.closeMenuButton.focus());
+  }
+
+  function closeMenu(options) {
+    if (!isMobile()) return;
+    const settings = options || {};
+    const el = elements();
+    document.body.classList.remove('nav-open');
+    el.menuButton.setAttribute('aria-expanded', 'false');
+    el.contents.setAttribute('aria-hidden', 'true');
+    if (settings.restoreFocus) el.menuButton.focus();
+  }
+
+  function syncResponsiveState() {
+    const el = elements();
+
+    if (isMobile()) {
+      applyMobileCollapseDefaults();
+      el.contents.setAttribute('aria-hidden', document.body.classList.contains('nav-open') ? 'false' : 'true');
+    } else {
+      document.body.classList.remove('nav-open');
+      el.menuButton.setAttribute('aria-expanded', 'false');
+      el.contents.removeAttribute('aria-hidden');
+    }
+
+    renderTree();
+  }
+
   function bindEvents() {
     const el = elements();
+    let resizeTimer = null;
+
     window.addEventListener('hashchange', navigateFromHash);
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(syncResponsiveState, 120);
+    });
+
     el.search.addEventListener('input', renderSearchResults);
     el.clearSearch.addEventListener('click', () => {
       el.search.value = '';
@@ -473,11 +572,22 @@
       el.search.focus();
     });
 
+    el.menuButton.addEventListener('click', openMenu);
+    el.closeMenuButton.addEventListener('click', () => closeMenu({ restoreFocus: true }));
+    el.scrim.addEventListener('click', () => closeMenu({ restoreFocus: true }));
+
     document.getElementById('printButton').addEventListener('click', () => window.print());
     document.getElementById('decreaseText').addEventListener('click', () => setTextSize(state.textSize - 1));
     document.getElementById('increaseText').addEventListener('click', () => setTextSize(state.textSize + 1));
 
     document.addEventListener('click', event => {
+      const toggle = event.target.closest('[data-toggle-topic]');
+      if (toggle) {
+        event.preventDefault();
+        toggleTreeItem(toggle.dataset.toggleTopic);
+        return;
+      }
+
       const anchorLink = event.target.closest('a[data-manual-anchor]');
       if (anchorLink) {
         event.preventDefault();
@@ -489,19 +599,32 @@
       const pageLink = event.target.closest('a[data-manual-path]');
       if (pageLink) {
         event.preventDefault();
-        location.hash = 'page=' + encodeURIComponent(pageLink.dataset.manualPath);
+        const path = pageLink.dataset.manualPath;
+        const newHash = 'page=' + encodeURIComponent(path);
+        if (location.hash.replace(/^#/, '') === newHash) navigateFromHash();
+        else location.hash = newHash;
+        closeMenu();
       }
     });
 
     document.addEventListener('keydown', event => {
       const tag = document.activeElement && document.activeElement.tagName;
-      if (event.key === '/' && tag !== 'INPUT' && tag !== 'TEXTAREA') {
+
+      if (event.key === '/' && tag !== 'INPUT' && tag !== 'TEXTAREA' && !isMobile()) {
         event.preventDefault();
         el.search.focus();
       }
-      if (event.key === 'Escape' && document.activeElement === el.search && el.search.value) {
-        el.search.value = '';
-        renderSearchResults();
+
+      if (event.key === 'Escape') {
+        if (document.body.classList.contains('nav-open')) {
+          closeMenu({ restoreFocus: true });
+          return;
+        }
+
+        if (document.activeElement === el.search && el.search.value) {
+          el.search.value = '';
+          renderSearchResults();
+        }
       }
     });
   }
@@ -515,11 +638,14 @@
     }
 
     indexTree();
+    state.activePath = currentFromHash();
+    applyMobileCollapseDefaults();
     renderTree();
     renderSearchResults();
     bindEvents();
     setTextSize(state.textSize);
     document.documentElement.dataset.readerBuild = BUILD;
+    syncResponsiveState();
 
     if (!location.hash) history.replaceState(null, '', makePageHash('welcome.htm'));
     navigateFromHash();
