@@ -3,14 +3,30 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="color-scheme" content="dark">
-  <meta name="theme-color" content="#050505">
+  <meta name="color-scheme" content="dark light">
+  <meta id="themeColor" name="theme-color" content="#050505">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>ASPDotNetStorefront 10 Developer Documentation</title>
   <link rel="icon" href="../images/favicon.ico">
-  <link rel="stylesheet" href="styles.css?build=20260719-devdocs-3">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('manualTheme');
+        var theme = stored === 'light' || stored === 'dark'
+          ? stored
+          : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+        document.getElementById('themeColor').setAttribute('content', theme === 'light' ? '#f7f8fa' : '#050505');
+      } catch (_error) {
+        document.documentElement.dataset.theme = 'dark';
+      }
+    }());
+  </script>
+  <link rel="stylesheet" href="styles.css?build=20260719-devdocs-4">
+  <link rel="stylesheet" href="themes.css?build=20260719-devdocs-4">
 </head>
 <body>
   <a class="skip-link" href="#articleBody">Skip to documentation</a>
@@ -37,10 +53,14 @@
           <small>Developer Documentation</small>
         </span>
       </a>
-      <span class="version-badge">v10 · build 3</span>
+      <span class="version-badge">v10 · build 4</span>
     </div>
 
     <div class="header-tools" aria-label="Documentation controls">
+      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch color mode" title="Switch color mode">
+        <span id="themeToggleIcon" class="theme-toggle-icon" aria-hidden="true">☀</span>
+        <span id="themeToggleText" class="theme-toggle-text">Light</span>
+      </button>
       <button id="decreaseText" type="button" title="Decrease documentation text size" aria-label="Decrease text size">A−</button>
       <button id="increaseText" type="button" title="Increase documentation text size" aria-label="Increase text size">A+</button>
       <button id="printButton" type="button">Print</button>
@@ -122,8 +142,9 @@
     </main>
   </div>
 
-  <script src="app.js?build=20260719-devdocs-3"></script>
-  <script src="../contents_data.js?build=20260719-devdocs-3"></script>
+  <script src="theme.js?build=20260719-devdocs-4"></script>
+  <script src="app.js?build=20260719-devdocs-4"></script>
+  <script src="../contents_data.js?build=20260719-devdocs-4"></script>
   <script>ManualReader.start();</script>
 </body>
 </html>
