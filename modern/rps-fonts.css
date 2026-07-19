@@ -1,0 +1,106 @@
+/* RPS official typography system.
+   Archivo Black / Archivo ExtraBold: display and headings
+   Inter: body copy
+   Space Grotesk: navigation, labels, controls, and technical UI
+   True source-code samples remain monospace for readability. */
+
+:root {
+  --rps-display: "Archivo Black", "Archivo", Impact, sans-serif;
+  --rps-heading: "Archivo", "Inter", Arial, sans-serif;
+  --rps-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  --rps-ui: "Space Grotesk", "Inter", Arial, sans-serif;
+}
+
+body,
+.article-body,
+.legacy-article {
+  font-family: var(--rps-body);
+}
+
+.article-title,
+.article-body h1,
+.article-body .heading {
+  font-family: var(--rps-display) !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.025em;
+}
+
+.article-body h2,
+.article-body h3,
+.article-body h4,
+.article-body h5,
+.contents-heading h1,
+.results-heading h2,
+.outline h2,
+.mobile-menu-heading strong {
+  font-family: var(--rps-heading) !important;
+  font-weight: 800;
+}
+
+.product-name strong {
+  font-family: var(--rps-heading) !important;
+  font-weight: 800;
+}
+
+.product-name small,
+.menu-button,
+.version-badge,
+.header-tools button,
+.header-tools a,
+.theme-toggle-text,
+.section-label,
+.contents-heading p,
+.search-area label,
+.search-row input,
+.search-row button,
+.search-results > p,
+.search-results li,
+.tree-link,
+.tree-label,
+.contents-footer,
+.breadcrumbs,
+.article-source,
+.outline a,
+.page-nav small,
+.page-nav span,
+.loading-state,
+.error-box,
+.mobile-menu-heading button {
+  font-family: var(--rps-ui) !important;
+}
+
+.tree-link,
+.tree-label,
+.search-row input,
+.breadcrumbs,
+.outline a {
+  letter-spacing: -0.01em;
+}
+
+.section-label,
+.product-name small,
+.page-nav small,
+.theme-toggle-text {
+  letter-spacing: 0.06em;
+}
+
+/* Preserve conventional monospace rendering for literal source code. */
+.article-body pre,
+.article-body pre code,
+.article-body code,
+.article-body .code,
+.product-mark,
+.prompt-symbol {
+  font-family: var(--mono) !important;
+}
+
+@media (max-width: 900px) {
+  .product-name strong {
+    font-size: 12px;
+  }
+
+  .tree-link,
+  .tree-label {
+    font-size: 13px;
+  }
+}
