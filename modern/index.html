@@ -28,47 +28,32 @@
       }
     }());
   </script>
-  <link rel="stylesheet" href="styles.css?build=20260719-devdocs-11">
-  <link rel="stylesheet" href="themes.css?build=20260719-devdocs-11">
-  <link rel="stylesheet" href="rps-fonts.css?build=20260719-devdocs-11">
-  <link rel="stylesheet" href="home.css?build=20260719-devdocs-11">
-  <link rel="stylesheet" href="monochrome.css?build=20260719-devdocs-11">
-  <link rel="stylesheet" href="desktop-layout.css?build=20260719-devdocs-11">
-  <link rel="stylesheet" href="links-blue.css?build=20260719-devdocs-11">
+  <link rel="stylesheet" href="styles.css?build=20260719-devdocs-12">
+  <link rel="stylesheet" href="themes.css?build=20260719-devdocs-12">
+  <link rel="stylesheet" href="rps-fonts.css?build=20260719-devdocs-12">
+  <link rel="stylesheet" href="home.css?build=20260719-devdocs-12">
+  <link rel="stylesheet" href="monochrome.css?build=20260719-devdocs-12">
+  <link rel="stylesheet" href="desktop-layout.css?build=20260719-devdocs-12">
+  <link rel="stylesheet" href="links-blue.css?build=20260719-devdocs-12">
 </head>
 <body>
   <a class="skip-link" href="#articleBody">Skip to documentation</a>
 
   <header class="site-header">
-    <button
-      id="menuButton"
-      class="menu-button"
-      type="button"
-      aria-label="Open documentation menu"
-      aria-controls="contentsPanel"
-      aria-expanded="false">
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <strong>Menu</strong>
+    <button id="menuButton" class="menu-button" type="button" aria-label="Open documentation menu" aria-controls="contentsPanel" aria-expanded="false">
+      <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span><strong>Menu</strong>
     </button>
 
     <div class="site-title">
       <a href="#page=welcome.htm" data-manual-path="welcome.htm" aria-label="ASPDotNetStorefront documentation home">
         <span class="product-mark" aria-hidden="true">&lt;/&gt;</span>
-        <span class="product-name">
-          <strong>ASPDotNetStorefront</strong>
-          <small>Developer Documentation</small>
-        </span>
+        <span class="product-name"><strong>ASPDotNetStorefront</strong><small>Developer Documentation</small></span>
       </a>
-      <span class="version-badge">v10 · build 11</span>
+      <span class="version-badge">v10 · build 12</span>
     </div>
 
     <div class="header-tools" aria-label="Documentation controls">
-      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch color mode" title="Switch color mode">
-        <span id="themeToggleIcon" class="theme-toggle-icon" aria-hidden="true">◐</span>
-        <span id="themeToggleText" class="theme-toggle-text">Light</span>
-      </button>
+      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch color mode" title="Switch color mode"><span id="themeToggleIcon" class="theme-toggle-icon" aria-hidden="true">◐</span><span id="themeToggleText" class="theme-toggle-text">Light</span></button>
       <button id="decreaseText" type="button" title="Decrease documentation text size" aria-label="Decrease text size">A−</button>
       <button id="increaseText" type="button" title="Increase documentation text size" aria-label="Increase text size">A+</button>
       <button id="printButton" type="button">Print</button>
@@ -78,84 +63,39 @@
 
   <div class="page-layout">
     <aside id="contentsPanel" class="contents-panel" aria-label="Documentation navigation">
-      <div class="mobile-menu-heading">
-        <div>
-          <span class="section-label">NAVIGATION</span>
-          <strong>Documentation</strong>
-        </div>
-        <button id="closeMenuButton" type="button" aria-label="Close documentation menu">Close ×</button>
-      </div>
-
-      <div class="contents-heading">
-        <div>
-          <span class="section-label">REFERENCE</span>
-          <h1>Documentation</h1>
-        </div>
-        <p id="topicCount"></p>
-      </div>
-
+      <div class="mobile-menu-heading"><div><span class="section-label">NAVIGATION</span><strong>Documentation</strong></div><button id="closeMenuButton" type="button" aria-label="Close documentation menu">Close ×</button></div>
+      <div class="contents-heading"><div><span class="section-label">REFERENCE</span><h1>Documentation</h1></div><p id="topicCount"></p></div>
       <div class="search-area">
         <label for="navSearch">Search documentation</label>
-        <div class="search-row">
-          <span class="search-prefix" aria-hidden="true">⌕</span>
-          <input id="navSearch" type="search" placeholder="AppConfigs, orders, products…" autocomplete="off" spellcheck="false">
-          <button id="clearSearch" type="button">Clear</button>
-        </div>
+        <div class="search-row"><span class="search-prefix" aria-hidden="true">⌕</span><input id="navSearch" type="search" placeholder="AppConfigs, orders, products…" autocomplete="off" spellcheck="false"><button id="clearSearch" type="button">Clear</button></div>
         <p class="search-help">Search results are separate from the collapsible table of contents.</p>
       </div>
-
-      <section id="searchResultsSection" class="search-results" hidden>
-        <div class="results-heading">
-          <span class="section-label">MATCHES</span>
-          <h2>Search results</h2>
-        </div>
-        <p id="searchStatus" aria-live="polite"></p>
-        <ol id="searchResultsList"></ol>
-      </section>
-
+      <section id="searchResultsSection" class="search-results" hidden><div class="results-heading"><span class="section-label">MATCHES</span><h2>Search results</h2></div><p id="searchStatus" aria-live="polite"></p><ol id="searchResultsList"></ol></section>
       <nav id="manualTree" class="manual-tree" aria-label="Table of contents"></nav>
-
-      <div class="contents-footer">
-        <span>Tap arrows to expand sections</span>
-        <a href="../index.html">Legacy ↗</a>
-      </div>
+      <div class="contents-footer"><span>Tap arrows to expand sections</span><a href="../index.html">Legacy ↗</a></div>
     </aside>
 
     <button id="menuScrim" class="menu-scrim" type="button" aria-label="Close documentation menu" tabindex="-1"></button>
 
     <main class="article-panel">
-      <div class="article-toolbar">
-        <nav class="breadcrumbs" id="breadcrumbs" aria-label="Breadcrumb"></nav>
-      </div>
-
+      <div class="article-toolbar"><nav class="breadcrumbs" id="breadcrumbs" aria-label="Breadcrumb"></nav></div>
       <div class="article-and-outline">
         <article id="article" class="article" tabindex="-1">
-          <div class="loading-state" id="loadingState">
-            <span class="prompt-symbol" aria-hidden="true">$</span>
-            <span>Loading documentation…</span>
-          </div>
+          <div class="loading-state" id="loadingState"><span class="prompt-symbol" aria-hidden="true">$</span><span>Loading documentation…</span></div>
           <div id="articleBody" class="article-body"></div>
-          <nav class="page-nav" aria-label="Previous and next articles">
-            <a id="previousPage" href="#"></a>
-            <a id="nextPage" href="#"></a>
-          </nav>
+          <nav class="page-nav" aria-label="Previous and next articles"><a id="previousPage" href="#"></a><a id="nextPage" href="#"></a></nav>
         </article>
-
-        <aside class="outline" id="outline" aria-label="On this page" hidden>
-          <span class="section-label">ON THIS PAGE</span>
-          <h2>Contents</h2>
-          <nav id="outlineLinks"></nav>
-        </aside>
+        <aside class="outline" id="outline" aria-label="On this page" hidden><span class="section-label">ON THIS PAGE</span><h2>Contents</h2><nav id="outlineLinks"></nav></aside>
       </div>
     </main>
   </div>
 
-  <script src="theme.js?build=20260719-devdocs-11"></script>
-  <script src="app.js?build=20260719-devdocs-11"></script>
-  <script src="home-accordions.js?build=20260719-devdocs-11"></script>
-  <script src="sidebar-defaults.js?build=20260719-devdocs-11"></script>
-  <script src="scroll-memory.js?build=20260719-devdocs-11"></script>
-  <script src="../contents_data.js?build=20260719-devdocs-11"></script>
+  <script src="theme.js?build=20260719-devdocs-12"></script>
+  <script src="app.js?build=20260719-devdocs-12"></script>
+  <script src="home-accordions.js?build=20260719-devdocs-12"></script>
+  <script src="sidebar-defaults.js?build=20260719-devdocs-12"></script>
+  <script src="scroll-memory.js?build=20260719-devdocs-12"></script>
+  <script src="../contents_data.js?build=20260719-devdocs-12"></script>
   <script>ManualReader.start();</script>
 </body>
 </html>
