@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>ASPDotNetStorefront 10 Manual — Modern Reader</title>
+  <link rel="icon" href="../images/favicon.ico">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#article">Skip to article</a>
+
+  <header class="topbar">
+    <button class="icon-button mobile-only" id="menuButton" type="button" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false">
+      <span aria-hidden="true">☰</span>
+    </button>
+    <a class="brand" href="#page=welcome.htm" aria-label="Manual home">
+      <span class="brand-mark" aria-hidden="true">A</span>
+      <span>
+        <strong>ASPDotNetStorefront</strong>
+        <small>10.0 Manual · Modern Reader</small>
+      </span>
+    </a>
+    <div class="top-actions">
+      <button class="text-button" id="decreaseText" type="button" aria-label="Decrease article text size">A−</button>
+      <button class="text-button" id="increaseText" type="button" aria-label="Increase article text size">A+</button>
+      <button class="text-button" id="printButton" type="button">Print</button>
+      <a class="text-button" id="originalLink" href="../welcome.htm" target="_blank" rel="noopener">Original page</a>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Manual navigation">
+      <div class="search-wrap">
+        <label for="navSearch">Search topics</label>
+        <div class="search-field">
+          <span aria-hidden="true">⌕</span>
+          <input id="navSearch" type="search" placeholder="Products, AppConfigs, orders…" autocomplete="off" spellcheck="false">
+          <kbd>/</kbd>
+        </div>
+        <p class="search-status" id="searchStatus" aria-live="polite"></p>
+      </div>
+      <nav id="manualTree" class="manual-tree" aria-label="Table of contents"></nav>
+      <div class="sidebar-footer">
+        <span>Version 10.0.0–10.0.26</span>
+        <a href="../index.html">Legacy reader</a>
+      </div>
+    </aside>
+
+    <button class="scrim" id="scrim" type="button" aria-label="Close navigation"></button>
+
+    <main class="main-panel">
+      <div class="content-toolbar">
+        <nav class="breadcrumbs" id="breadcrumbs" aria-label="Breadcrumb"></nav>
+      </div>
+
+      <div class="reading-layout">
+        <article class="article" id="article" tabindex="-1">
+          <div class="loading-state" id="loadingState">
+            <span class="spinner" aria-hidden="true"></span>
+            <span>Loading article…</span>
+          </div>
+          <div id="articleBody" class="article-body"></div>
+          <nav class="page-nav" aria-label="Previous and next articles">
+            <a id="previousPage" class="page-nav-link" href="#"></a>
+            <a id="nextPage" class="page-nav-link page-nav-link-next" href="#"></a>
+          </nav>
+        </article>
+
+        <aside class="outline" id="outline" aria-label="On this page">
+          <strong>On this page</strong>
+          <nav id="outlineLinks"></nav>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <iframe id="legacyFrame" class="legacy-frame" title="Legacy manual article loader" tabindex="-1"></iframe>
+
+  <script src="app.js"></script>
+  <script src="../contents_data.js"></script>
+  <script>ManualReader.start();</script>
+</body>
+</html>
