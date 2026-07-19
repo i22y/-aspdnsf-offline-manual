@@ -30,7 +30,7 @@
     toggle.setAttribute('title', 'Switch to ' + nextTheme + ' mode');
     toggle.setAttribute('aria-pressed', String(theme === 'light'));
 
-    if (icon) icon.textContent = theme === 'dark' ? '☀' : '☾';
+    if (icon) icon.textContent = theme === 'dark' ? '◐' : '◑';
     if (text) text.textContent = theme === 'dark' ? 'Light' : 'Dark';
   }
 
