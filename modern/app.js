@@ -1,24 +1,27 @@
 (function () {
   'use strict';
 
+  const BUILD = '2026.07.19-devdocs-2';
+  const RAW_BASE = 'https://raw.githubusercontent.com/i22y/-aspdnsf-offline-manual/modern-reader/';
+  let nextId = 1;
+
   const state = {
     root: null,
     activePath: 'welcome.htm',
-    expanded: new Set(),
     flat: [],
     byPath: new Map(),
-    search: '',
-    textSize: readTextSize()
+    textSize: readTextSize(),
+    loadToken: 0
   };
 
   const entities = document.createElement('textarea');
 
   function readTextSize() {
     try {
-      const value = Number(localStorage.getItem('manualTextSize') || 17);
-      return Number.isFinite(value) ? value : 17;
+      const value = Number(localStorage.getItem('manualTextSize') || 16);
+      return Number.isFinite(value) ? value : 16;
     } catch (_error) {
-      return 17;
+      return 16;
     }
   }
 
@@ -29,8 +32,18 @@
 
   function normalizePath(value) {
     if (!value) return '';
-    const clean = String(value).split('#')[0].split('?')[0];
+    let clean = String(value).trim();
+    try { clean = decodeURIComponent(clean); } catch (_error) { /* keep original */ }
+    clean = clean.split('#')[0].split('?')[0].replace(/\\/g, '/');
     return clean.substring(clean.lastIndexOf('/') + 1).toLowerCase();
+  }
+
+  function encodePath(path) {
+    return String(path || '')
+      .replace(/^\/+/, '')
+      .split('/')
+      .map(segment => encodeURIComponent(segment))
+      .join('/');
   }
 
   function node(type, title, link) {
@@ -41,11 +54,12 @@
       path: normalizePath(link),
       children: [],
       parent: null,
-      id: Math.random().toString(36).slice(2)
+      trail: [],
+      id: 'topic-' + nextId++
     };
   }
 
-  // Adapter functions consumed by the legacy contents_data.js file.
+  // Adapter functions consumed by the original contents_data.js file.
   window.gFld = function (title, link) { return node('folder', title, link); };
   window.gLnk = function (_target, title, link) { return node('document', title, link); };
   window.insFld = function (parent, child) {
@@ -63,8 +77,11 @@
     return {
       tree: document.getElementById('manualTree'),
       search: document.getElementById('navSearch'),
-      status: document.getElementById('searchStatus'),
-      frame: document.getElementById('legacyFrame'),
+      clearSearch: document.getElementById('clearSearch'),
+      resultsSection: document.getElementById('searchResultsSection'),
+      resultsList: document.getElementById('searchResultsList'),
+      searchStatus: document.getElementById('searchStatus'),
+      topicCount: document.getElementById('topicCount'),
       body: document.getElementById('articleBody'),
       loading: document.getElementById('loadingState'),
       breadcrumbs: document.getElementById('breadcrumbs'),
@@ -73,8 +90,7 @@
       previous: document.getElementById('previousPage'),
       next: document.getElementById('nextPage'),
       original: document.getElementById('originalLink'),
-      menu: document.getElementById('menuButton'),
-      scrim: document.getElementById('scrim')
+      article: document.getElementById('article')
     };
   }
 
@@ -83,90 +99,51 @@
     state.byPath.clear();
 
     function walk(item, ancestors) {
-      const trail = ancestors.concat(item);
+      item.trail = ancestors.concat(item);
       if (item.link && item.path) {
-        item.trail = trail;
         state.flat.push(item);
         if (!state.byPath.has(item.path)) state.byPath.set(item.path, item);
       }
-      item.children.forEach(child => walk(child, trail));
+      item.children.forEach(child => walk(child, item.trail));
     }
 
     state.root.children.forEach(child => walk(child, []));
   }
 
-  function highlight(text, query) {
-    if (!query) return escapeHtml(text);
-    const index = text.toLowerCase().indexOf(query.toLowerCase());
-    if (index < 0) return escapeHtml(text);
-    return escapeHtml(text.slice(0, index)) + '<mark>' + escapeHtml(text.slice(index, index + query.length)) + '</mark>' + escapeHtml(text.slice(index + query.length));
-  }
-
   function escapeHtml(value) {
-    return String(value).replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
-  }
-
-  function matchingCount(item, query) {
-    let count = item.title.toLowerCase().includes(query) ? 1 : 0;
-    item.children.forEach(child => { count += matchingCount(child, query); });
-    return count;
+    return String(value).replace(/[&<>'"]/g, character => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    }[character]));
   }
 
   function renderTree() {
     const el = elements();
-    const query = state.search.trim().toLowerCase();
-    let totalMatches = 0;
 
     function renderItems(items) {
       const list = document.createElement('ul');
       list.className = 'tree-list';
 
       items.forEach(item => {
-        const subtreeMatches = query ? matchingCount(item, query) : 1;
-        if (query && subtreeMatches === 0) return;
-        if (query) totalMatches += item.title.toLowerCase().includes(query) ? 1 : 0;
-
         const li = document.createElement('li');
-        const row = document.createElement('div');
-        row.className = 'tree-row';
-        const hasChildren = item.children.length > 0;
-        const isOpen = query ? true : state.expanded.has(item.id);
+        li.className = 'tree-item' + (item.children.length ? ' has-children' : '');
+        li.dataset.topicId = item.id;
 
-        if (hasChildren) {
-          const toggle = document.createElement('button');
-          toggle.type = 'button';
-          toggle.className = 'tree-toggle';
-          toggle.setAttribute('aria-label', (isOpen ? 'Collapse ' : 'Expand ') + item.title);
-          toggle.setAttribute('aria-expanded', String(isOpen));
-          toggle.addEventListener('click', () => {
-            if (state.expanded.has(item.id)) state.expanded.delete(item.id);
-            else state.expanded.add(item.id);
-            renderTree();
-          });
-          row.appendChild(toggle);
-        } else {
-          const spacer = document.createElement('span');
-          spacer.className = 'tree-toggle-spacer';
-          row.appendChild(spacer);
-        }
+        const label = item.link ? document.createElement('a') : document.createElement('span');
+        label.className = (item.link ? 'tree-link' : 'tree-label') + (item.path === state.activePath ? ' active' : '');
+        label.textContent = item.title || 'Untitled';
 
         if (item.link) {
-          const link = document.createElement('a');
-          link.className = 'tree-link' + (item.path === state.activePath ? ' active' : '');
-          link.href = '#page=' + encodeURIComponent(item.link);
-          link.innerHTML = highlight(item.title, query);
-          link.title = item.title;
-          link.addEventListener('click', () => closeMobileNav());
-          row.appendChild(link);
-        } else {
-          const label = document.createElement('span');
-          label.className = 'tree-link';
-          label.innerHTML = highlight(item.title, query);
-          row.appendChild(label);
+          label.href = makePageHash(item.link);
+          label.dataset.manualPath = item.link;
+          label.addEventListener('click', handleManualPageClick);
         }
 
-        li.appendChild(row);
-        if (hasChildren && isOpen) li.appendChild(renderItems(item.children));
+        li.appendChild(label);
+        if (item.children.length) li.appendChild(renderItems(item.children));
         list.appendChild(li);
       });
 
@@ -174,15 +151,48 @@
     }
 
     el.tree.replaceChildren(renderItems(state.root.children));
-    el.status.textContent = query ? (totalMatches + (totalMatches === 1 ? ' matching topic' : ' matching topics')) : (state.flat.length + ' topics');
+    el.topicCount.textContent = state.flat.length + ' topics';
   }
 
-  function openAncestors(item) {
-    let current = item && item.parent;
-    while (current) {
-      state.expanded.add(current.id);
-      current = current.parent;
+  function renderSearchResults() {
+    const el = elements();
+    const query = el.search.value.trim().toLowerCase();
+    el.resultsList.replaceChildren();
+
+    if (!query) {
+      el.resultsSection.hidden = true;
+      el.searchStatus.textContent = '';
+      return;
     }
+
+    const matches = state.flat.filter(item => {
+      const trailText = item.trail.map(part => part.title).join(' ');
+      return (item.title + ' ' + trailText + ' ' + item.link).toLowerCase().includes(query);
+    });
+
+    matches.forEach(item => {
+      const li = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = makePageHash(item.link);
+      link.dataset.manualPath = item.link;
+      link.textContent = item.trail.map(part => part.title).filter(Boolean).join(' / ');
+      link.addEventListener('click', handleManualPageClick);
+      li.appendChild(link);
+      el.resultsList.appendChild(li);
+    });
+
+    el.searchStatus.textContent = matches.length + (matches.length === 1 ? ' matching topic' : ' matching topics');
+    el.resultsSection.hidden = false;
+  }
+
+  function makePageHash(path) {
+    return '#page=' + encodeURIComponent(path);
+  }
+
+  function handleManualPageClick(event) {
+    event.preventDefault();
+    const path = event.currentTarget.dataset.manualPath;
+    location.hash = 'page=' + encodeURIComponent(path);
   }
 
   function currentFromHash() {
@@ -192,186 +202,198 @@
 
   function navigateFromHash() {
     const requested = currentFromHash();
-    const item = state.byPath.get(requested);
-    state.activePath = item ? item.path : requested;
-    if (item) openAncestors(item);
+    const item = state.byPath.get(requested) || null;
+    const exactPath = item ? item.link : requested;
+    state.activePath = requested;
+
     renderTree();
-    renderBreadcrumbs(item);
+    renderBreadcrumbs(item, requested);
     updatePageNavigation(item);
-    elements().original.href = '../' + (item ? item.link : requested);
-
-    if (requested === 'welcome.htm') {
-      renderHome();
-      return;
-    }
-
-    loadLegacyPage(item ? item.link : requested);
+    elements().original.href = new URL('../' + encodePath(exactPath), document.baseURI).href;
+    loadArticle(exactPath, item);
   }
 
-  function renderBreadcrumbs(item) {
+  function renderBreadcrumbs(item, requested) {
     const el = elements().breadcrumbs;
     el.replaceChildren();
 
     const home = document.createElement('a');
-    home.href = '#page=welcome.htm';
-    home.textContent = 'Manual';
+    home.href = makePageHash('welcome.htm');
+    home.dataset.manualPath = 'welcome.htm';
+    home.textContent = 'docs';
+    home.addEventListener('click', handleManualPageClick);
     el.appendChild(home);
 
-    if (!item) return;
+    if (!item) {
+      const unknown = document.createElement('span');
+      unknown.textContent = requested;
+      el.appendChild(unknown);
+      return;
+    }
+
     item.trail.forEach((part, index) => {
       const span = document.createElement('span');
-      if (index === item.trail.length - 1 || !part.link) {
-        span.textContent = part.title;
-      } else {
+      if (part.link && index < item.trail.length - 1) {
         const link = document.createElement('a');
-        link.href = '#page=' + encodeURIComponent(part.link);
+        link.href = makePageHash(part.link);
+        link.dataset.manualPath = part.link;
         link.textContent = part.title;
+        link.addEventListener('click', handleManualPageClick);
         span.appendChild(link);
+      } else {
+        span.textContent = part.title;
       }
       el.appendChild(span);
     });
   }
 
   function updatePageNavigation(item) {
-    const el = elements();
     const index = item ? state.flat.indexOf(item) : -1;
-    configurePageLink(el.previous, index > 0 ? state.flat[index - 1] : null, 'Previous');
-    configurePageLink(el.next, index >= 0 && index < state.flat.length - 1 ? state.flat[index + 1] : null, 'Next');
+    configurePageLink(elements().previous, index > 0 ? state.flat[index - 1] : null, 'Previous');
+    configurePageLink(elements().next, index >= 0 && index < state.flat.length - 1 ? state.flat[index + 1] : null, 'Next');
   }
 
   function configurePageLink(anchor, item, label) {
     if (!item) {
       anchor.hidden = true;
       anchor.removeAttribute('href');
-      anchor.textContent = '';
+      anchor.replaceChildren();
       return;
     }
+
     anchor.hidden = false;
-    anchor.href = '#page=' + encodeURIComponent(item.link);
+    anchor.href = makePageHash(item.link);
+    anchor.dataset.manualPath = item.link;
     anchor.innerHTML = '<small>' + label + '</small><span>' + escapeHtml(item.title) + '</span>';
+    anchor.onclick = handleManualPageClick;
   }
 
-  function renderHome() {
+  async function loadArticle(path, item) {
     const el = elements();
-    el.frame.src = 'about:blank';
-    el.loading.hidden = true;
-    el.outline.hidden = true;
-    el.body.innerHTML = '';
-
-    const hero = document.createElement('section');
-    hero.className = 'home-hero';
-    hero.innerHTML = '<h1>ASPDotNetStorefront 10 Manual</h1><p>A cleaner way to browse the complete offline documentation. Search by topic, expand the organized table of contents, and read every article in a focused layout.</p>';
-    el.body.appendChild(hero);
-
-    const grid = document.createElement('div');
-    grid.className = 'home-grid';
-    state.root.children.filter(item => item.title && item.link).forEach(item => {
-      const card = document.createElement('a');
-      card.className = 'home-card';
-      card.href = '#page=' + encodeURIComponent(item.link);
-      const count = countLinkedDescendants(item);
-      card.innerHTML = '<strong>' + escapeHtml(item.title) + '</strong><span>' + count + (count === 1 ? ' article' : ' articles') + '</span>';
-      grid.appendChild(card);
-    });
-    el.body.appendChild(grid);
-    document.title = 'ASPDotNetStorefront 10 Manual — Modern Reader';
-    document.getElementById('article').focus({ preventScroll: true });
-  }
-
-  function countLinkedDescendants(item) {
-    let count = item.link ? 1 : 0;
-    item.children.forEach(child => { count += countLinkedDescendants(child); });
-    return count;
-  }
-
-  function loadLegacyPage(path) {
-    const el = elements();
-    el.body.innerHTML = '';
+    const token = ++state.loadToken;
     el.loading.hidden = false;
+    el.body.replaceChildren();
     el.outline.hidden = true;
-    el.frame.src = '../' + path;
-  }
-
-  function frameLoaded() {
-    const el = elements();
-    if (!el.frame.src || el.frame.src === 'about:blank') return;
+    el.outlineLinks.replaceChildren();
 
     try {
-      const doc = el.frame.contentDocument;
-      if (!doc || !doc.body) throw new Error('The article document could not be read.');
-      const source = doc.querySelector('.page_body') || doc.querySelector('#tdpage') || doc.body;
+      const result = await fetchManualFile(path);
+      if (token !== state.loadToken) return;
+
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(result.html, 'text/html');
+      const source = doc.querySelector('.page_body') || doc.querySelector('#tdpage') || doc.querySelector('main') || doc.body;
+      if (!source) throw new Error('The article file did not contain readable HTML.');
+
       const clone = document.createElement('div');
       clone.className = 'legacy-article';
       clone.innerHTML = source.innerHTML;
-      cleanArticle(clone, el.frame.contentWindow.location.href);
-      const item = state.byPath.get(state.activePath);
-      const title = item ? item.title : extractTitle(clone, doc);
+      cleanArticle(clone, result.url);
 
-      el.body.innerHTML = '';
-      const kicker = document.createElement('p');
-      kicker.className = 'article-kicker';
-      kicker.textContent = item && item.parent ? item.parent.title : 'Documentation';
+      const title = item ? item.title : extractTitle(clone, doc, path);
+      removeDuplicateHeading(clone, title);
+
       const heading = document.createElement('h1');
       heading.className = 'article-title';
       heading.textContent = title;
-      const content = document.createElement('div');
-      content.className = 'article-content';
-      content.appendChild(clone);
 
-      removeDuplicateHeading(content, title);
-      el.body.append(kicker, heading, content);
+      const sourceLine = document.createElement('p');
+      sourceLine.className = 'article-source';
+      sourceLine.textContent = path + (result.fallback ? ' · loaded from repository fallback' : '');
+
+      el.body.append(heading, sourceLine, clone);
       el.loading.hidden = true;
-      document.title = title + ' — ASPDotNetStorefront Manual';
-      buildOutline(content);
-      document.getElementById('article').focus({ preventScroll: true });
+      document.title = title + ' — ASPDotNetStorefront Developer Documentation';
+      buildOutline(el.body);
+      el.article.focus({ preventScroll: true });
       window.scrollTo({ top: 0, behavior: 'auto' });
     } catch (error) {
+      if (token !== state.loadToken) return;
       el.loading.hidden = true;
-      el.body.innerHTML = '<div class="error-box"><strong>This article could not be loaded in the modern reader.</strong><br>' + escapeHtml(error.message) + '<br><br><a href="../' + encodeURI(state.activePath) + '">Open the original article</a></div>';
+      renderLoadError(path, error);
     }
   }
 
+  async function fetchManualFile(path) {
+    const encodedPath = encodePath(path);
+    const pageUrl = new URL('../' + encodedPath, document.baseURI).href;
+    const rawUrl = RAW_BASE + encodedPath;
+    const attempts = [
+      { url: pageUrl, fallback: false },
+      { url: rawUrl, fallback: true }
+    ];
+    const errors = [];
+
+    for (const attempt of attempts) {
+      try {
+        const response = await fetch(attempt.url, { cache: 'no-store', credentials: 'omit' });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const html = await response.text();
+        if (!html || /<title>\s*Page not found\s*<\/title>/i.test(html)) throw new Error('Page-not-found response');
+        return { html, url: attempt.url, fallback: attempt.fallback };
+      } catch (error) {
+        errors.push(attempt.url + ' (' + error.message + ')');
+      }
+    }
+
+    throw new Error(errors.join(' | '));
+  }
+
   function cleanArticle(root, baseUrl) {
-    root.querySelectorAll('script, style, link, meta, iframe, object, embed, .pageprop').forEach(node => node.remove());
-    root.querySelectorAll('.var_breadcrumbs').forEach(node => {
+    root.querySelectorAll('script, style, link, meta, iframe, object, embed, noscript, .pageprop').forEach(node => node.remove());
+    root.querySelectorAll('.var_breadcrumbs, #google_translate_element, .search_container, .print_button, .bookmark_button').forEach(node => {
       const parent = node.closest('p');
       (parent || node).remove();
     });
-    root.querySelectorAll('[id="txtsearch"], #google_translate_element, .search_container').forEach(node => node.remove());
+    root.querySelectorAll('[id="txtsearch"]').forEach(node => node.remove());
 
     root.querySelectorAll('[src]').forEach(node => {
       const value = node.getAttribute('src');
-      if (!value || value.startsWith('data:') || value.startsWith('javascript:')) return;
-      try { node.setAttribute('src', new URL(value, baseUrl).href); } catch (_error) { /* keep original */ }
+      if (!value || /^(data:|blob:|javascript:)/i.test(value)) return;
+      try { node.setAttribute('src', new URL(value, baseUrl).href); } catch (_error) { /* preserve original */ }
     });
 
     root.querySelectorAll('a[href]').forEach(anchor => {
       const value = anchor.getAttribute('href');
-      if (!value || value.startsWith('mailto:') || value.startsWith('tel:') || value.startsWith('javascript:')) return;
+      if (!value) return;
+
+      if (/^javascript:/i.test(value)) {
+        anchor.removeAttribute('href');
+        return;
+      }
+
+      if (/^(mailto:|tel:)/i.test(value)) return;
+
       if (value.startsWith('#')) {
         anchor.href = '#';
         anchor.dataset.manualAnchor = value.slice(1);
         return;
       }
+
       try {
         const url = new URL(value, baseUrl);
         const path = normalizePath(url.pathname);
-        if (/\.html?$/i.test(path) && state.byPath.has(path)) {
-          anchor.href = '#page=' + encodeURIComponent(path);
+        if (/\.html?$/i.test(path)) {
+          anchor.href = makePageHash(path);
           anchor.dataset.manualPath = path;
           anchor.removeAttribute('target');
+          anchor.removeAttribute('rel');
         } else {
           anchor.href = url.href;
           anchor.target = '_blank';
           anchor.rel = 'noopener';
         }
-      } catch (_error) { /* keep original */ }
+      } catch (_error) {
+        // Leave unusual but valid legacy links unchanged.
+      }
     });
   }
 
-  function extractTitle(root, doc) {
+  function extractTitle(root, doc, path) {
     const heading = root.querySelector('.heading, h1, h2');
-    return heading ? heading.textContent.trim() : (doc.title || 'Manual article').replace(/^ASPDNSF\s*-\s*/i, '');
+    if (heading && heading.textContent.trim()) return heading.textContent.trim();
+    if (doc.title && !/^aspdnsf\s*-\s*1000$/i.test(doc.title.trim())) return doc.title.trim();
+    return path.replace(/\.html?$/i, '').replace(/[_-]+/g, ' ').replace(/\b\w/g, letter => letter.toUpperCase());
   }
 
   function removeDuplicateHeading(content, title) {
@@ -388,56 +410,69 @@
 
   function buildOutline(content) {
     const el = elements();
-    const headings = Array.from(content.querySelectorAll('h1, h2, h3, .heading')).filter(heading => heading.textContent.trim());
+    const headings = Array.from(content.querySelectorAll('h2, h3, h4, .heading'))
+      .filter(heading => heading.textContent.trim() && !heading.classList.contains('article-title'));
     const seen = new Set();
     el.outlineLinks.replaceChildren();
 
-    headings.slice(0, 18).forEach((heading, index) => {
-      let slug = slugify(heading.textContent) || ('section-' + (index + 1));
-      while (seen.has(slug)) slug += '-2';
+    headings.forEach((heading, index) => {
+      let slug = heading.id || slugify(heading.textContent) || ('section-' + (index + 1));
+      const base = slug;
+      let suffix = 2;
+      while (seen.has(slug)) slug = base + '-' + suffix++;
       seen.add(slug);
-      heading.id = heading.id || slug;
+      heading.id = slug;
+
       const link = document.createElement('a');
       link.href = '#';
-      link.dataset.manualAnchor = heading.id;
+      link.dataset.manualAnchor = slug;
       link.textContent = heading.textContent.trim();
-      if (heading.matches('h3')) link.className = 'level-3';
+      if (heading.matches('h3, h4')) link.className = 'level-3';
       el.outlineLinks.appendChild(link);
     });
 
-    el.outline.hidden = headings.length < 2;
+    el.outline.hidden = headings.length === 0;
   }
 
   function slugify(value) {
-    return value.toLowerCase().replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').slice(0, 60);
+    return String(value || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .slice(0, 70);
+  }
+
+  function renderLoadError(path, error) {
+    const el = elements();
+    const directUrl = new URL('../' + encodePath(path), document.baseURI).href;
+    const rawUrl = RAW_BASE + encodePath(path);
+    el.body.innerHTML =
+      '<div class="error-box">' +
+      '<strong>Unable to load this documentation file.</strong><br><br>' +
+      '<code>' + escapeHtml(path) + '</code><br><br>' +
+      escapeHtml(error.message) + '<br><br>' +
+      '<a href="' + escapeHtml(directUrl) + '" target="_blank" rel="noopener">Open published file</a><br>' +
+      '<a href="' + escapeHtml(rawUrl) + '" target="_blank" rel="noopener">Open repository file</a>' +
+      '</div>';
   }
 
   function setTextSize(value) {
-    state.textSize = Math.max(14, Math.min(22, value));
+    state.textSize = Math.max(13, Math.min(22, value));
     document.documentElement.style.setProperty('--article-size', state.textSize + 'px');
-    try { localStorage.setItem('manualTextSize', String(state.textSize)); } catch (_error) { /* storage may be unavailable */ }
-  }
-
-  function openMobileNav() {
-    document.body.classList.add('nav-open');
-    elements().menu.setAttribute('aria-expanded', 'true');
-  }
-
-  function closeMobileNav() {
-    document.body.classList.remove('nav-open');
-    elements().menu.setAttribute('aria-expanded', 'false');
+    try { localStorage.setItem('manualTextSize', String(state.textSize)); } catch (_error) { /* storage can be unavailable */ }
   }
 
   function bindEvents() {
     const el = elements();
     window.addEventListener('hashchange', navigateFromHash);
-    el.frame.addEventListener('load', frameLoaded);
-    el.search.addEventListener('input', event => {
-      state.search = event.target.value;
-      renderTree();
+    el.search.addEventListener('input', renderSearchResults);
+    el.clearSearch.addEventListener('click', () => {
+      el.search.value = '';
+      renderSearchResults();
+      el.search.focus();
     });
-    el.menu.addEventListener('click', () => document.body.classList.contains('nav-open') ? closeMobileNav() : openMobileNav());
-    el.scrim.addEventListener('click', closeMobileNav);
+
     document.getElementById('printButton').addEventListener('click', () => window.print());
     document.getElementById('decreaseText').addEventListener('click', () => setTextSize(state.textSize - 1));
     document.getElementById('increaseText').addEventListener('click', () => setTextSize(state.textSize + 1));
@@ -452,9 +487,10 @@
       }
 
       const pageLink = event.target.closest('a[data-manual-path]');
-      if (!pageLink) return;
-      event.preventDefault();
-      location.hash = 'page=' + encodeURIComponent(pageLink.dataset.manualPath);
+      if (pageLink) {
+        event.preventDefault();
+        location.hash = 'page=' + encodeURIComponent(pageLink.dataset.manualPath);
+      }
     });
 
     document.addEventListener('keydown', event => {
@@ -463,13 +499,9 @@
         event.preventDefault();
         el.search.focus();
       }
-      if (event.key === 'Escape') {
-        closeMobileNav();
-        if (document.activeElement === el.search && el.search.value) {
-          el.search.value = '';
-          state.search = '';
-          renderTree();
-        }
+      if (event.key === 'Escape' && document.activeElement === el.search && el.search.value) {
+        el.search.value = '';
+        renderSearchResults();
       }
     });
   }
@@ -478,16 +510,20 @@
     state.root = window.foldersTree;
     if (!state.root || !Array.isArray(state.root.children)) {
       elements().loading.hidden = true;
-      elements().body.innerHTML = '<div class="error-box">The table of contents could not be initialized.</div>';
+      elements().body.innerHTML = '<div class="error-box">The original table of contents could not be initialized.</div>';
       return;
     }
 
     indexTree();
+    renderTree();
+    renderSearchResults();
     bindEvents();
     setTextSize(state.textSize);
-    if (!location.hash) history.replaceState(null, '', '#page=welcome.htm');
+    document.documentElement.dataset.readerBuild = BUILD;
+
+    if (!location.hash) history.replaceState(null, '', makePageHash('welcome.htm'));
     navigateFromHash();
   }
 
-  window.ManualReader = { start };
+  window.ManualReader = { start, build: BUILD };
 }());
