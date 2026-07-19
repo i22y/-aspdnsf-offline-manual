@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#050505">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -10,33 +10,54 @@
   <meta http-equiv="Expires" content="0">
   <title>ASPDotNetStorefront 10 Developer Documentation</title>
   <link rel="icon" href="../images/favicon.ico">
-  <link rel="stylesheet" href="styles.css?build=20260719-devdocs-2">
+  <link rel="stylesheet" href="styles.css?build=20260719-devdocs-3">
 </head>
 <body>
   <a class="skip-link" href="#articleBody">Skip to documentation</a>
 
   <header class="site-header">
+    <button
+      id="menuButton"
+      class="menu-button"
+      type="button"
+      aria-label="Open documentation menu"
+      aria-controls="contentsPanel"
+      aria-expanded="false">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <strong>Menu</strong>
+    </button>
+
     <div class="site-title">
-      <a href="#page=welcome.htm" aria-label="ASPDotNetStorefront documentation home">
+      <a href="#page=welcome.htm" data-manual-path="welcome.htm" aria-label="ASPDotNetStorefront documentation home">
         <span class="product-mark" aria-hidden="true">&lt;/&gt;</span>
         <span class="product-name">
           <strong>ASPDotNetStorefront</strong>
           <small>Developer Documentation</small>
         </span>
       </a>
-      <span class="version-badge">v10.0.0–10.0.26 · build 2</span>
+      <span class="version-badge">v10 · build 3</span>
     </div>
 
     <div class="header-tools" aria-label="Documentation controls">
-      <button id="decreaseText" type="button" title="Decrease documentation text size">Text −</button>
-      <button id="increaseText" type="button" title="Increase documentation text size">Text +</button>
+      <button id="decreaseText" type="button" title="Decrease documentation text size" aria-label="Decrease text size">A−</button>
+      <button id="increaseText" type="button" title="Increase documentation text size" aria-label="Increase text size">A+</button>
       <button id="printButton" type="button">Print</button>
-      <a id="originalLink" href="../welcome.htm" target="_blank" rel="noopener">View source page ↗</a>
+      <a id="originalLink" href="../welcome.htm" target="_blank" rel="noopener">Source ↗</a>
     </div>
   </header>
 
   <div class="page-layout">
-    <aside class="contents-panel" aria-label="Complete documentation navigation">
+    <aside id="contentsPanel" class="contents-panel" aria-label="Documentation navigation">
+      <div class="mobile-menu-heading">
+        <div>
+          <span class="section-label">NAVIGATION</span>
+          <strong>Documentation</strong>
+        </div>
+        <button id="closeMenuButton" type="button" aria-label="Close documentation menu">Close ×</button>
+      </div>
+
       <div class="contents-heading">
         <div>
           <span class="section-label">REFERENCE</span>
@@ -52,7 +73,7 @@
           <input id="navSearch" type="search" placeholder="AppConfigs, orders, products…" autocomplete="off" spellcheck="false">
           <button id="clearSearch" type="button">Clear</button>
         </div>
-        <p class="search-help">Search results are shown separately. The complete table of contents below is never collapsed or filtered.</p>
+        <p class="search-help">Search results are separate from the collapsible table of contents.</p>
       </div>
 
       <section id="searchResultsSection" class="search-results" hidden>
@@ -64,13 +85,15 @@
         <ol id="searchResultsList"></ol>
       </section>
 
-      <nav id="manualTree" class="manual-tree" aria-label="Complete table of contents"></nav>
+      <nav id="manualTree" class="manual-tree" aria-label="Table of contents"></nav>
 
       <div class="contents-footer">
-        <span>Complete tree · no hidden topics</span>
-        <a href="../index.html">Legacy reader ↗</a>
+        <span>Tap arrows to expand sections</span>
+        <a href="../index.html">Legacy ↗</a>
       </div>
     </aside>
+
+    <button id="menuScrim" class="menu-scrim" type="button" aria-label="Close documentation menu" tabindex="-1"></button>
 
     <main class="article-panel">
       <div class="article-toolbar">
@@ -99,8 +122,8 @@
     </main>
   </div>
 
-  <script src="app.js?build=20260719-devdocs-2"></script>
-  <script src="../contents_data.js?build=20260719-devdocs-2"></script>
+  <script src="app.js?build=20260719-devdocs-3"></script>
+  <script src="../contents_data.js?build=20260719-devdocs-3"></script>
   <script>ManualReader.start();</script>
 </body>
 </html>
