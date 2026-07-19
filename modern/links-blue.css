@@ -1,0 +1,49 @@
+/* Documentation links: blue in both dark and light themes. */
+:root {
+  --doc-link: #58a6ff;
+  --doc-link-hover: #79c0ff;
+}
+
+html[data-theme="light"] {
+  --doc-link: #0969da;
+  --doc-link-hover: #0550ae;
+}
+
+/* Keep the product/brand link white; all functional documentation links are blue. */
+a:not(.site-title > a) {
+  color: var(--doc-link) !important;
+}
+
+a:not(.site-title > a):hover {
+  color: var(--doc-link-hover) !important;
+}
+
+.tree-link,
+.tree-link.active,
+.search-results a,
+.breadcrumbs a,
+.outline a,
+.page-nav a,
+.contents-footer a,
+.article-body a,
+.article-body .manual-home-overview a,
+.article-body .manual-home-links a {
+  color: var(--doc-link) !important;
+}
+
+.tree-link:hover,
+.search-results a:hover,
+.breadcrumbs a:hover,
+.outline a:hover,
+.page-nav a:hover,
+.contents-footer a:hover,
+.article-body a:hover,
+.article-body .manual-home-overview a:hover,
+.article-body .manual-home-links a:hover {
+  color: var(--doc-link-hover) !important;
+}
+
+.tree-link.active {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
