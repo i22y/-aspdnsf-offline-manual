@@ -5,28 +5,47 @@
   if (!tree) return;
 
   let finished = false;
+  let settleTimer = null;
 
-  function closeReleaseNotesOnce() {
+  function labelFor(row) {
+    const label = row.querySelector('.tree-link, .tree-label');
+    return label ? label.textContent.trim().toLowerCase() : '';
+  }
+
+  function applyNextDefault() {
     if (finished) return;
 
-    const rows = Array.from(tree.querySelectorAll('.tree-row'));
-    const releaseRow = rows.find(row => {
-      const label = row.querySelector('.tree-link, .tree-label');
-      return label && label.textContent.trim().toLowerCase() === 'release notes';
-    });
+    const rootList = tree.querySelector(':scope > .tree-list');
+    if (!rootList) return;
 
-    if (!releaseRow) return;
+    const folderItems = Array.from(tree.querySelectorAll('.tree-item.has-children'));
 
-    const toggle = releaseRow.querySelector('.tree-toggle');
-    if (toggle && toggle.getAttribute('aria-expanded') === 'true') {
-      toggle.click();
+    for (const item of folderItems) {
+      const row = item.querySelector(':scope > .tree-row');
+      const toggle = row && row.querySelector('.tree-toggle');
+      if (!toggle) continue;
+
+      const isTopLevel = item.parentElement === rootList;
+      const isWsiNodes = labelFor(row) === 'wsi nodes';
+      const shouldBeExpanded = !isTopLevel && !isWsiNodes;
+      const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+
+      if (isExpanded !== shouldBeExpanded) {
+        toggle.click();
+        return;
+      }
     }
 
     finished = true;
     observer.disconnect();
   }
 
-  const observer = new MutationObserver(closeReleaseNotesOnce);
+  function scheduleApply() {
+    clearTimeout(settleTimer);
+    settleTimer = setTimeout(applyNextDefault, 0);
+  }
+
+  const observer = new MutationObserver(scheduleApply);
   observer.observe(tree, { childList: true, subtree: true });
-  closeReleaseNotesOnce();
+  scheduleApply();
 }());
