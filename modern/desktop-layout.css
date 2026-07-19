@@ -1,0 +1,27 @@
+/* Desktop width correction: do not reserve an empty outline column. */
+@media (min-width: 901px) {
+  .article-and-outline {
+    width: 100%;
+    max-width: none;
+  }
+
+  .article-and-outline:has(.outline[hidden]) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .article-and-outline:has(.outline[hidden]) .article {
+    max-width: none;
+    width: 100%;
+  }
+
+  .article-and-outline:has(.outline[hidden]) .article-body {
+    width: 100%;
+  }
+}
+
+@media (min-width: 1201px) {
+  .article-and-outline {
+    padding-left: clamp(38px, 4vw, 64px);
+    padding-right: clamp(38px, 4vw, 64px);
+  }
+}
