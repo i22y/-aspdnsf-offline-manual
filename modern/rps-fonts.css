@@ -96,47 +96,140 @@ body,
 
 @media (max-width: 900px) {
   body {
-    font-size: 17px;
-    line-height: 1.68;
+    font-size: 18px;
+    line-height: 1.7;
+  }
+
+  .menu-button {
+    min-width: 58px;
+    font-size: 14px !important;
+    line-height: 1.1;
   }
 
   .product-name strong {
-    font-size: 12px;
+    font-size: 13px;
+  }
+
+  .mobile-menu-heading {
+    min-height: 72px;
+  }
+
+  .mobile-menu-heading strong {
+    font-size: 20px !important;
+    line-height: 1.15;
+  }
+
+  .mobile-menu-heading button {
+    min-width: 76px;
+    font-size: 14px !important;
+  }
+
+  .section-label {
+    font-size: 12px !important;
+    line-height: 1.3;
+  }
+
+  .search-area label {
+    margin-bottom: 9px;
+    font-size: 15px !important;
+    line-height: 1.3;
+  }
+
+  .search-row input {
+    height: 50px;
+    font-size: 16px !important;
+  }
+
+  .search-row button {
+    min-width: 60px;
+    font-size: 14px !important;
+  }
+
+  .search-help {
+    font-size: 13px !important;
+    line-height: 1.5;
+  }
+
+  .search-results > p,
+  .search-results li {
+    font-size: 15px !important;
+    line-height: 1.5;
+  }
+
+  .tree-toggle,
+  .tree-toggle-spacer {
+    flex-basis: 48px;
+    width: 48px;
+    min-height: 52px;
+  }
+
+  .tree-toggle span {
+    font-size: 25px;
   }
 
   .tree-link,
   .tree-label {
-    font-size: 13px;
+    min-height: 52px;
+    padding: 12px 8px;
+    font-size: 16px !important;
+    line-height: 1.4;
+  }
+
+  .tree-item.has-children > .tree-row > .tree-link,
+  .tree-item.has-children > .tree-row > .tree-label {
+    font-size: 16.5px !important;
+  }
+
+  .contents-footer {
+    font-size: 13px !important;
+    line-height: 1.4;
   }
 
   .article-body {
-    font-size: max(var(--article-size), 18px);
-    line-height: 1.72;
+    font-size: max(var(--article-size), 19px);
+    line-height: 1.75;
   }
 
   .article-body p,
   .article-body li,
   .article-body td,
   .article-body th {
-    line-height: 1.72;
+    line-height: 1.75;
   }
 
   .article-source {
-    font-size: 12px !important;
+    font-size: 13px !important;
     line-height: 1.5;
   }
 
   .breadcrumbs {
-    font-size: 11.5px;
+    font-size: 13px !important;
   }
 
-  .outline a,
-  .search-help {
-    font-size: 12px;
+  .outline a {
+    font-size: 14px !important;
+    line-height: 1.5;
+  }
+
+  .page-nav small {
+    font-size: 11px !important;
   }
 
   .page-nav span {
-    font-size: 13px;
+    font-size: 15px !important;
     line-height: 1.45;
+  }
+}
+
+@media (max-width: 390px) {
+  .tree-link,
+  .tree-label,
+  .tree-item.has-children > .tree-row > .tree-link,
+  .tree-item.has-children > .tree-row > .tree-label {
+    font-size: 16px !important;
+  }
+
+  .article-body {
+    font-size: max(var(--article-size), 19px);
   }
 }
