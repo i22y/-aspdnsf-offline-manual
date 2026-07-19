@@ -1,0 +1,194 @@
+﻿/* Change the style below to customize the default font style for this project  */
+
+.page_body
+{
+    font-size: 15px;
+    font-family: Source Sans Pro,Tahoma, Arial;
+    padding: 25px;
+    margin: 0px;
+    color:#333333;
+}
+
+
+/* ------------------ Modify the styles below to add,edit or delete page status entries ---- */
+.TreeNode_status_Pending { background-color: #A0DC2C }
+.TreeNode_status_Incomplete { background-color: #A0B6FF }
+.TreeNode_status_Needs_Review { background-color: #FFD016 }
+.GrayedTreeNode { color:#AAA9A9; }
+
+.TogglePanel         {WIDTH:100%; BORDER:1px solid #cccccc; }
+.TogglePanel_Heading {BACKGROUND-IMAGE:url(images/col.gif); BACKGROUND-REPEAT:no-repeat; BACKGROUND-POSITION:Left center; padding-left:20px; padding-top:4px; padding-right:4px; padding-bottom:4px; cursor:pointer; border-left:0px solid white; border-top:0px solid white; vertical-align:top;}
+.TogglePanel_Body    {padding-left:20px; padding-top:4px; padding-right:4px; padding-bottom:4px; border-left:0px solid white; vertical-align:top;}
+
+.iconpanel {height:88px!important;width:147px!important;background-image:url(images_KB2/panel.png);overflow:hidden;float:left;padding-left:3px;padding-right:3px;}
+.iconpanel A:link {text-decoration: none; color: #ececec!important;}
+.iconpanel A:active {text-decoration: none; color: #ececec!important;}
+.iconpanel A:visited {text-decoration: none; color: #ececec!important;}
+.iconpanel A:hover {text-decoration: underline;}
+
+
+/* ------------------------------ Custom Styles ----------------------------- */
+
+
+.code /*stylelist*/
+{
+font-family: courier new;
+font-size:14px;
+}
+
+.codecomment /*stylelist*/
+{
+font-family: courier new;
+font-size:14px;
+color: green;
+}
+
+.button  /*stylelist*/
+{
+    display: inline-block;
+    margin: 2px;
+    font-family: 'Source Sans Pro', Arial;
+    font-weight: normal;
+    text-align: center;
+    vertical-align: middle;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    background-image: none;
+    border: solid 1px #7a7a7a;
+    border-bottom: solid 3px transparent;
+    white-space: nowrap;
+    padding: 7px 10px;
+    font-size: 16px;
+    line-height: 1.33;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    color: #ffffff !important;
+    background-color: #00b3ea;
+    border-color: #009fd1;
+    text-decoration:none !important;
+}
+.button:hover
+{
+color: #ffffff !important;
+background-color: #008cb7;
+border-color: #007193;
+text-decoration:none !important;
+}
+
+.Step1 /*stylelist*/
+{
+background-image: url('images/step1.png');
+display: block;
+margin: 0px 10px 0px 0px;
+padding: 25px 10px 0px 70px;
+background-repeat: no-repeat;
+background-position: top left;
+min-height: 40px;
+border-bottom: solid 2px #009fd1;
+font-size: 30px;
+font-weight: bold;
+}
+
+.Step2 /*stylelist*/
+{
+background-image: url('images/step2.png');
+display: block;
+margin: 0px 10px 0px 0px;
+padding: 25px 10px 0px 70px;
+background-repeat: no-repeat;
+background-position: top left;
+min-height: 40px;
+border-bottom: solid 2px #009fd1;
+font-size: 30px;
+font-weight: bold;
+}
+
+.Step3 /*stylelist*/
+{
+background-image: url('images/step3.png');
+display: block;
+margin: 0px 10px 0px 0px;
+padding: 25px 10px 0px 70px;
+background-repeat: no-repeat;
+background-position: top left;
+min-height: 40px;
+border-bottom: solid 2px #009fd1;
+font-size: 30px;
+font-weight: bold;
+}
+
+.Step4 /*stylelist*/
+{
+background-image: url('images/step4.png');
+display: block;
+margin: 0px 10px 0px 0px;
+padding: 25px 10px 0px 70px;
+background-repeat: no-repeat;
+background-position: top left;
+min-height: 40px;
+border-bottom: solid 2px #009fd1;
+font-size: 30px;
+font-weight: bold;
+}
+
+.Step5 /*stylelist*/
+{
+background-image: url('images/step5.png');
+display: block;
+margin: 0px 10px 0px 0px;
+padding: 25px 10px 0px 70px;
+background-repeat: no-repeat;
+background-position: top left;
+min-height: 40px;
+border-bottom: solid 2px #009fd1;
+font-size: 30px;
+font-weight: bold;
+}
+
+.Step6 /*stylelist*/
+{
+background-image: url('images/step6.png');
+display: block;
+margin: 0px 10px 0px 0px;
+padding: 25px 10px 0px 70px;
+background-repeat: no-repeat;
+background-position: top left;
+min-height: 40px;
+border-bottom: solid 2px #009fd1;
+font-size: 30px;
+font-weight: bold;
+}
+
+.Step7 /*stylelist*/
+{
+background-image: url('images/step7.png');
+display: block;
+margin: 0px 10px 0px 0px;
+padding: 25px 10px 0px 70px;
+background-repeat: no-repeat;
+background-position: top left;
+min-height: 40px;
+border-bottom: solid 2px #009fd1;
+font-size: 30px;
+font-weight: bold;
+}
+
+.Step8 /*stylelist*/
+{
+background-image: url('images/step8.png');
+display: block;
+margin: 0px 10px 0px 0px;
+padding: 25px 10px 0px 70px;
+background-repeat: no-repeat;
+background-position: top left;
+min-height: 40px;
+border-bottom: solid 2px #009fd1;
+font-size: 30px;
+font-weight: bold;
+}
