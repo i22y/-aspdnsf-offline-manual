@@ -95,6 +95,11 @@ body,
 }
 
 @media (max-width: 900px) {
+  body {
+    font-size: 17px;
+    line-height: 1.68;
+  }
+
   .product-name strong {
     font-size: 12px;
   }
@@ -102,5 +107,36 @@ body,
   .tree-link,
   .tree-label {
     font-size: 13px;
+  }
+
+  .article-body {
+    font-size: max(var(--article-size), 18px);
+    line-height: 1.72;
+  }
+
+  .article-body p,
+  .article-body li,
+  .article-body td,
+  .article-body th {
+    line-height: 1.72;
+  }
+
+  .article-source {
+    font-size: 12px !important;
+    line-height: 1.5;
+  }
+
+  .breadcrumbs {
+    font-size: 11.5px;
+  }
+
+  .outline a,
+  .search-help {
+    font-size: 12px;
+  }
+
+  .page-nav span {
+    font-size: 13px;
+    line-height: 1.45;
   }
 }
