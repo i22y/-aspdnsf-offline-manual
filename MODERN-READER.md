@@ -23,3 +23,7 @@ The original manual files remain unchanged. The modern reader uses the existing 
 ## Branch separation
 
 The `main` branch is the preserved original offline manual. This `modern-reader` branch is the alternate version.
+
+## GitHub Pages
+
+Publish this branch from `/(root)`. The root `index.html` redirects visitors to the modern reader.
