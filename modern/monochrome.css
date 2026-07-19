@@ -1,0 +1,115 @@
+/* Global monochrome interface layer. Keeps documentation images intact. */
+:root {
+  --accent: #ffffff;
+  --accent-soft: rgba(255, 255, 255, .09);
+  --link: #ffffff;
+  --danger: #ffffff;
+}
+
+html {
+  accent-color: var(--strong);
+}
+
+html[data-theme="light"] {
+  --accent: #000000;
+  --accent-soft: rgba(0, 0, 0, .07);
+  --link: #000000;
+  --danger: #000000;
+}
+
+::selection {
+  color: var(--bg);
+  background: var(--strong);
+}
+
+:where(a, button, input, summary):focus-visible {
+  outline-color: var(--strong);
+}
+
+/* Remove colored emphasis from navigation and controls. */
+.product-mark,
+.section-label,
+.prompt-symbol,
+.search-results a,
+.tree-link.active,
+.article-body a {
+  color: var(--strong) !important;
+}
+
+.tree-link.active {
+  background: var(--accent-soft);
+  border-color: var(--line);
+}
+
+.search-results {
+  background: var(--raised);
+  border-color: var(--line);
+}
+
+.search-results a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.skip-link {
+  color: var(--bg);
+  background: var(--strong);
+}
+
+/* Neutralize colored notice, warning, and error treatments. */
+.article-body .Caution,
+.article-body .Warning,
+.article-body .Note,
+.article-body .Tip,
+.error-box {
+  color: var(--text) !important;
+  background: var(--raised) !important;
+  border-color: var(--line) !important;
+  border-left-color: var(--strong) !important;
+}
+
+/* Light-mode rules in themes.css previously used green, blue, and red tints. */
+html[data-theme="light"] .skip-link {
+  color: #ffffff;
+  background: #000000;
+}
+
+html[data-theme="light"] .product-mark,
+html[data-theme="light"] .section-label,
+html[data-theme="light"] .prompt-symbol,
+html[data-theme="light"] .search-results a,
+html[data-theme="light"] .tree-link.active,
+html[data-theme="light"] .article-body a {
+  color: #000000 !important;
+}
+
+html[data-theme="light"] .tree-link.active {
+  background: rgba(0, 0, 0, .07);
+  border-color: var(--line);
+}
+
+html[data-theme="light"] .search-results,
+html[data-theme="light"] .article-body .Caution,
+html[data-theme="light"] .article-body .Warning,
+html[data-theme="light"] .article-body .Note,
+html[data-theme="light"] .article-body .Tip,
+html[data-theme="light"] .error-box {
+  color: var(--text) !important;
+  background: var(--raised) !important;
+  border-color: var(--line) !important;
+  border-left-color: #000000 !important;
+}
+
+/* Keep homepage interactions monochrome in both themes. */
+.manual-home-kicker,
+.manual-home-card-title,
+.manual-home-toggle,
+.article-body .manual-home-overview a,
+.article-body .manual-home-links a {
+  color: var(--strong) !important;
+}
+
+.manual-home-card-number,
+.article-body .manual-home-links a::before {
+  color: var(--muted) !important;
+}
