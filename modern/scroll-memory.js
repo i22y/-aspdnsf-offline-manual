@@ -47,7 +47,7 @@
     if (pendingRestore === null) return;
 
     if (!articleIsReady()) {
-      if (attempt < 60) restoreTimer = setTimeout(function () { restoreWhenReady(attempt + 1); }, 25);
+      if (attempt < 80) restoreTimer = setTimeout(function () { restoreWhenReady(attempt + 1); }, 25);
       return;
     }
 
@@ -60,6 +60,11 @@
         replaceScrollState(target);
       });
     });
+  }
+
+  function deferRestore() {
+    clearTimeout(restoreTimer);
+    restoreTimer = setTimeout(function () { restoreWhenReady(0); }, 0);
   }
 
   window.addEventListener('scroll', scheduleSave, { passive: true });
@@ -82,7 +87,6 @@
     linkNavigation = false;
     const state = event.state && typeof event.state === 'object' ? event.state : {};
     pendingRestore = Number.isFinite(Number(state.manualScrollY)) ? Number(state.manualScrollY) : 0;
-    restoreWhenReady(0);
   });
 
   window.addEventListener('hashchange', function () {
@@ -94,12 +98,13 @@
       pendingRestore = Number.isFinite(Number(state.manualScrollY)) ? Number(state.manualScrollY) : 0;
     }
 
-    restoreWhenReady(0);
+    /* Let the reader's hashchange handler clear the old article before testing readiness. */
+    deferRestore();
   });
 
   if (articleBody) {
     new MutationObserver(function () {
-      if (pendingRestore !== null) restoreWhenReady(0);
+      if (pendingRestore !== null) deferRestore();
     }).observe(articleBody, { childList: true, subtree: true });
   }
 
