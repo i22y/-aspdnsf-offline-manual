@@ -7,11 +7,13 @@ $ErrorActionPreference = 'Stop'
 
 $repoRoot = Split-Path -Parent $PSCommandPath
 $manualPath = (Resolve-Path -LiteralPath $repoRoot).Path
+$manualAgentsPath = Join-Path $manualPath 'AGENTS.md'
 $codexDirectory = Join-Path $HOME '.codex'
 $agentsPath = Join-Path $codexDirectory 'AGENTS.md'
+$tick = [char]96
 
-$startMarker = '<!-- BEGIN RPS ASPDNSF MANUAL — MANAGED BLOCK -->'
-$endMarker = '<!-- END RPS ASPDNSF MANUAL — MANAGED BLOCK -->'
+$startMarker = '<!-- BEGIN RPS ASPDNSF MANUAL - MANAGED BLOCK -->'
+$endMarker = '<!-- END RPS ASPDNSF MANUAL - MANAGED BLOCK -->'
 
 function Remove-ManagedBlock {
     param([string]$Text)
@@ -20,7 +22,7 @@ function Remove-ManagedBlock {
         return ''
     }
 
-    $pattern = '(?ms)^\s*' + [regex]::Escape($startMarker) + '.*?' + [regex]::Escape($endMarker) + '\s*'
+    $pattern = '(?ms)(?:\r?\n)?' + [regex]::Escape($startMarker) + '.*?' + [regex]::Escape($endMarker) + '(?:\r?\n)?'
     return ([regex]::Replace($Text, $pattern, '')).Trim()
 }
 
@@ -46,6 +48,10 @@ if ($Uninstall) {
     exit 0
 }
 
+if (-not (Test-Path -LiteralPath $manualAgentsPath)) {
+    throw "The repository AGENTS.md file was not found at: $manualAgentsPath"
+}
+
 New-Item -ItemType Directory -Path $codexDirectory -Force | Out-Null
 
 $managedBlock = @"
@@ -56,9 +62,9 @@ Whenever a task concerns RPS, RPS Manufacturing Solutions, an RPS webstore, mycr
 
 1. Treat the local ASPDNSF manual below as the primary platform-documentation source:
 
-   `$manualPath`
+   $tick$manualPath$tick
 
-2. Read `$manualPath\AGENTS.md` before performing platform-specific work.
+2. Read $tick$manualAgentsPath$tick before performing platform-specific work.
 3. Search the manual's HTML files for relevant documented behavior before recommending or implementing changes.
 4. Inspect the current RPS project's existing implementation before proposing new architecture.
 5. Do not rely only on generic ASP.NET, MVC, Razor, or modern ecommerce assumptions.
@@ -68,7 +74,7 @@ Whenever a task concerns RPS, RPS Manufacturing Solutions, an RPS webstore, mycr
 9. Preserve multistore compatibility unless the task explicitly applies to one store only.
 10. If the local manual path is unavailable in the current environment, use the canonical repository as the fallback reference and state that the local copy could not be accessed:
 
-    `https://github.com/i22y/-aspdnsf-offline-manual`
+    ${tick}https://github.com/i22y/-aspdnsf-offline-manual$tick
 
 Do not modify the archived manual pages unless the user specifically asks to update the documentation.
 $endMarker
