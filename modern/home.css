@@ -14,7 +14,7 @@
   display: block;
   margin-bottom: 8px;
   color: var(--strong);
-  font: 700 11px/1.3 var(--rps-ui, var(--mono));
+  font: 700 12px/1.3 var(--rps-ui, var(--mono));
   letter-spacing: .12em;
   text-transform: uppercase;
 }
@@ -119,7 +119,7 @@
 
 .manual-home-card-number {
   color: var(--muted);
-  font: 700 11px/1 var(--rps-ui, var(--mono));
+  font: 700 12px/1 var(--rps-ui, var(--mono));
   letter-spacing: .08em;
 }
 
