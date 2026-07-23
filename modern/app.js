@@ -1,9 +1,9 @@
 (function () {
   'use strict';
 
-  const BUILD = '2026.07.22-fulltext-3';
+  const BUILD = '2026.07.22-min14-1';
   const MOBILE_BREAKPOINT = 900;
-  const RAW_BASE = 'https://raw.githubusercontent.com/i22y/-aspdnsf-offline-manual/modern-reader/';
+  const RAW_BASE = 'https://raw.githubusercontent.com/RPS-Solutions/aspdnsf-reference-manual/modern-reader/';
   let nextId = 1;
 
   const state = {
@@ -646,7 +646,7 @@
   }
 
   function setTextSize(value) {
-    state.textSize = Math.max(14, Math.min(22, value));
+    state.textSize = Math.max(16, Math.min(22, value));
     document.documentElement.style.setProperty('--article-size', state.textSize + 'px');
     try { localStorage.setItem('manualTextSize', String(state.textSize)); } catch (_error) { /* storage can be unavailable */ }
   }
