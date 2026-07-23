@@ -140,6 +140,11 @@ html[data-theme="light"] .search-results a {
   color: #365a00;
 }
 
+html[data-theme="light"] .result-snippet mark {
+  color: #1e2a10;
+  background: rgba(120, 160, 40, 0.25);
+}
+
 html[data-theme="light"] .tree-list .tree-list {
   border-color: #c8ced5;
 }

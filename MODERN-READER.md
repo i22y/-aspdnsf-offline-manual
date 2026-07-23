@@ -10,6 +10,7 @@ The original manual files remain unchanged. The modern reader uses the existing 
 
 ## Improvements
 
+- Full-text search across every manual page (with highlighted snippets), not just topic titles
 - Searchable, collapsible table of contents
 - Cleaner typography and focused article width
 - Breadcrumb navigation
@@ -19,6 +20,16 @@ The original manual files remain unchanged. The modern reader uses the existing 
 - Responsive mobile navigation
 - Print-friendly article layout
 - Link to the untouched original page from every article
+
+## Full-text search index
+
+Search matches topic titles instantly, then lazy-loads `modern/search-index.js` (a pre-built full-text index of every article body) the first time you type a query. If any manual `*.htm` page changes, rebuild the index:
+
+```bash
+node modern/build-search-index.mjs
+```
+
+Commit the regenerated `modern/search-index.js` along with the page changes.
 
 ## Branch separation
 

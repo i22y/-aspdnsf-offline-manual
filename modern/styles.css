@@ -53,6 +53,8 @@ button,input{font:inherit} button{color:inherit} a{color:var(--link)}
 .search-results ol{max-height:280px;margin:8px 0 0;padding-left:22px;overflow:auto}
 .search-results li{font:11px var(--mono)}.search-results li+li{margin-top:6px}
 .search-results a{color:#c8e68b;text-decoration:none;overflow-wrap:anywhere}
+.result-snippet{margin:3px 0 0;color:var(--muted);font:10px/1.5 var(--mono);overflow-wrap:anywhere}
+.result-snippet mark{padding:0 1px;color:var(--strong);background:rgba(200,230,139,.22)}
 
 .manual-tree{padding:9px 8px 24px;overflow-wrap:anywhere}
 .tree-list{margin:0;padding:0;list-style:none}

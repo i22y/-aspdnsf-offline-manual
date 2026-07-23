@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const BUILD = '2026.07.19-devdocs-3';
+  const BUILD = '2026.07.22-fulltext-1';
   const MOBILE_BREAKPOINT = 900;
   const RAW_BASE = 'https://raw.githubusercontent.com/i22y/-aspdnsf-offline-manual/modern-reader/';
   let nextId = 1;
@@ -14,7 +14,10 @@
     collapsed: new Set(),
     mobileDefaultsApplied: false,
     textSize: readTextSize(),
-    loadToken: 0
+    loadToken: 0,
+    searchIndex: null,
+    searchIndexPromise: null,
+    searchIndexError: false
   };
 
   const entities = document.createElement('textarea');
@@ -222,6 +225,99 @@
     renderTree();
   }
 
+  function loadSearchIndex() {
+    if (state.searchIndexPromise) return state.searchIndexPromise;
+
+    state.searchIndexPromise = new Promise(resolve => {
+      const script = document.createElement('script');
+      script.src = 'search-index.js?build=' + encodeURIComponent(BUILD);
+      script.onload = () => {
+        const data = window.MANUAL_SEARCH_INDEX;
+        if (data && Array.isArray(data.pages)) state.searchIndex = data.pages;
+        else state.searchIndexError = true;
+        resolve();
+      };
+      script.onerror = () => {
+        state.searchIndexError = true;
+        resolve();
+      };
+      document.head.appendChild(script);
+    });
+
+    return state.searchIndexPromise;
+  }
+
+  function buildSnippet(text, query, tokens) {
+    const lower = text.toLowerCase();
+    let position = lower.indexOf(query);
+    let matchLength = query.length;
+
+    if (position === -1) {
+      position = lower.indexOf(tokens[0]);
+      matchLength = tokens[0].length;
+    }
+    if (position === -1) return '';
+
+    const radius = 80;
+    const start = Math.max(0, position - radius);
+    const end = Math.min(text.length, position + matchLength + radius);
+    let snippet = text.slice(start, end);
+    if (start > 0) snippet = '…' + snippet.replace(/^\S*\s/, '');
+    if (end < text.length) snippet = snippet.replace(/\s\S*$/, '') + '…';
+
+    // Collect highlight ranges on the plain snippet, merge overlaps, then
+    // emit escaped text with <mark> wrappers so markup is never corrupted.
+    const snippetLower = snippet.toLowerCase();
+    const terms = Array.from(new Set([query].concat(tokens).filter(Boolean)));
+    const ranges = [];
+    terms.forEach(term => {
+      let from = 0;
+      while (true) {
+        const at = snippetLower.indexOf(term, from);
+        if (at === -1) break;
+        ranges.push([at, at + term.length]);
+        from = at + term.length;
+      }
+    });
+    ranges.sort((a, b) => a[0] - b[0] || b[1] - a[1]);
+
+    const merged = [];
+    ranges.forEach(range => {
+      const last = merged[merged.length - 1];
+      if (last && range[0] <= last[1]) last[1] = Math.max(last[1], range[1]);
+      else merged.push(range.slice());
+    });
+
+    let html = '';
+    let cursor = 0;
+    merged.forEach(([from, to]) => {
+      html += escapeHtml(snippet.slice(cursor, from)) + '<mark>' + escapeHtml(snippet.slice(from, to)) + '</mark>';
+      cursor = to;
+    });
+    html += escapeHtml(snippet.slice(cursor));
+    return html;
+  }
+
+  function appendSearchResult(list, path, item, title, snippetHtml) {
+    const li = document.createElement('li');
+    const link = document.createElement('a');
+    link.href = makePageHash(path);
+    link.dataset.manualPath = path;
+    link.textContent = item
+      ? item.trail.map(part => part.title).filter(Boolean).join(' / ')
+      : title;
+    li.appendChild(link);
+
+    if (snippetHtml) {
+      const snippet = document.createElement('p');
+      snippet.className = 'result-snippet';
+      snippet.innerHTML = snippetHtml;
+      li.appendChild(snippet);
+    }
+
+    list.appendChild(li);
+  }
+
   function renderSearchResults() {
     const el = elements();
     const query = el.search.value.trim().toLowerCase();
@@ -233,22 +329,55 @@
       return;
     }
 
-    const matches = state.flat.filter(item => {
+    const tokens = query.split(/\s+/).filter(Boolean);
+    const matchedPaths = new Set();
+
+    // Pass 1: topic titles and tree trails (always available).
+    const titleMatches = state.flat.filter(item => {
       const trailText = item.trail.map(part => part.title).join(' ');
       return (item.title + ' ' + trailText + ' ' + item.link).toLowerCase().includes(query);
     });
 
-    matches.forEach(item => {
-      const li = document.createElement('li');
-      const link = document.createElement('a');
-      link.href = makePageHash(item.link);
-      link.dataset.manualPath = item.link;
-      link.textContent = item.trail.map(part => part.title).filter(Boolean).join(' / ');
-      li.appendChild(link);
-      el.resultsList.appendChild(li);
+    titleMatches.forEach(item => {
+      matchedPaths.add(item.path);
+      appendSearchResult(el.resultsList, item.link, item, item.title, '');
     });
 
-    el.searchStatus.textContent = matches.length + (matches.length === 1 ? ' matching topic' : ' matching topics');
+    // Pass 2: full page text (lazy-loaded index).
+    if (!state.searchIndex && !state.searchIndexError) {
+      loadSearchIndex().then(renderSearchResults);
+      el.searchStatus.textContent = titleMatches.length + ' title ' +
+        (titleMatches.length === 1 ? 'match' : 'matches') + ' — loading full-text index…';
+      el.resultsSection.hidden = false;
+      return;
+    }
+
+    let contentMatches = 0;
+    if (state.searchIndex) {
+      const phraseHits = [];
+      const tokenHits = [];
+
+      state.searchIndex.forEach(page => {
+        const path = normalizePath(page.p);
+        if (matchedPaths.has(path)) return;
+        const haystack = (page.t + ' ' + page.x).toLowerCase();
+        if (haystack.includes(query)) phraseHits.push(page);
+        else if (tokens.length > 1 && tokens.every(token => haystack.includes(token))) tokenHits.push(page);
+      });
+
+      const MAX_CONTENT_RESULTS = 50;
+      phraseHits.concat(tokenHits).slice(0, MAX_CONTENT_RESULTS).forEach(page => {
+        const path = normalizePath(page.p);
+        const item = state.byPath.get(path) || null;
+        appendSearchResult(el.resultsList, page.p, item, page.t, buildSnippet(page.x, query, tokens));
+        contentMatches += 1;
+      });
+    }
+
+    const total = titleMatches.length + contentMatches;
+    let status = total + (total === 1 ? ' matching page' : ' matching pages');
+    if (state.searchIndexError) status += ' (full-text index unavailable — titles only)';
+    el.searchStatus.textContent = status;
     el.resultsSection.hidden = false;
   }
 
@@ -565,7 +694,11 @@
       resizeTimer = setTimeout(syncResponsiveState, 120);
     });
 
-    el.search.addEventListener('input', renderSearchResults);
+    let searchTimer = null;
+    el.search.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(renderSearchResults, 120);
+    });
     el.clearSearch.addEventListener('click', () => {
       el.search.value = '';
       renderSearchResults();
