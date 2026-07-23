@@ -74,7 +74,7 @@ Whenever a task concerns RPS, RPS Manufacturing Solutions, an RPS webstore, mycr
 9. Preserve multistore compatibility unless the task explicitly applies to one store only.
 10. If the local manual path is unavailable in the current environment, use the canonical repository as the fallback reference and state that the local copy could not be accessed:
 
-    ${tick}https://github.com/i22y/-aspdnsf-offline-manual$tick
+    ${tick}https://github.com/RPS-Solutions/aspdnsf-reference-manual$tick
 
 Do not modify the archived manual pages unless the user specifically asks to update the documentation.
 $endMarker

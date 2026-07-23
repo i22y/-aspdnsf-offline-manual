@@ -2,12 +2,16 @@
 
 Offline ASPDotNetStorefront 10 documentation used as the canonical platform reference for RPS ecommerce-store development.
 
-## Codex setup for RPS work
+## AI agent setup for RPS work
 
-This repository includes:
+This repository is readable by any AI coding agent:
 
-- `AGENTS.md` — instructions Codex follows while working in this repository
+- `AGENTS.md` — the single source of truth: instructions any AI agent (OpenAI Codex, Cursor, Gemini CLI, and other `AGENTS.md`-aware tools) follows while working in this repository
+- `CLAUDE.md` — Claude Code entry point; imports `AGENTS.md`
+- `.github/copilot-instructions.md` — GitHub Copilot entry point; points to `AGENTS.md`
 - `install-rps-codex-reference.ps1` — registers this local manual in the user's global Codex instructions
+
+For Claude Code, a user-level skill or a note in `~/.claude/CLAUDE.md` pointing at this checkout applies the same rules globally when working in other RPS repositories.
 
 The installer preserves any existing global Codex instructions and adds or updates only its own managed RPS block.
 
@@ -55,4 +59,4 @@ This removes only the managed RPS block and preserves unrelated content in the g
 
 ## Canonical repository
 
-`https://github.com/i22y/-aspdnsf-offline-manual`
+`https://github.com/RPS-Solutions/aspdnsf-reference-manual`

@@ -1,4 +1,6 @@
-# RPS ASPDNSF Manual — Codex Instructions
+# RPS ASPDNSF Manual — AI Agent Instructions
+
+These instructions apply to every AI coding agent working in or referencing this repository — OpenAI Codex, Claude Code, GitHub Copilot, Cursor, Gemini CLI, and any other tool that reads `AGENTS.md` or an equivalent instructions file. `CLAUDE.md` and `.github/copilot-instructions.md` are thin pointers to this file; this file is the single source of truth.
 
 ## Purpose
 
@@ -92,6 +94,14 @@ If the manual does not answer the question, say that directly rather than presen
 
 Canonical repository:
 
-`https://github.com/i22y/-aspdnsf-offline-manual`
+`https://github.com/RPS-Solutions/aspdnsf-reference-manual`
 
-The included `install-rps-codex-reference.ps1` script can register the local checkout of this repository in the user's global Codex instructions so these rules are applied when working in separate RPS repositories.
+(Previously published as `i22y/-aspdnsf-offline-manual`; GitHub redirects the old URL.)
+
+## Registering the manual globally
+
+To have these rules apply when working in *other* RPS repositories, register this local checkout with your agent of choice:
+
+- **Codex** — run `install-rps-codex-reference.ps1` (included here); it writes a managed block into `%USERPROFILE%\.codex\AGENTS.md`.
+- **Claude Code** — a user-level skill (e.g. `~/.claude/skills/aspdnsf-manual/SKILL.md`) or a note in `~/.claude/CLAUDE.md` pointing at this checkout serves the same purpose.
+- **Other agents** — point their global/user instructions file at this checkout's path and tell them to search the manual's `*.htm` files before proposing ASPDNSF changes.
