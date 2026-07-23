@@ -77,8 +77,8 @@ button,input{font:inherit} button{color:inherit} a{color:var(--link)}
 .article-toolbar{position:sticky;z-index:20;top:var(--header);background:rgba(5,5,5,.97);border-bottom:1px solid var(--line)}
 .breadcrumbs{min-width:0;min-height:42px;display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:8px clamp(16px,3vw,38px);color:#777;font:14px var(--mono);overflow-wrap:anywhere}
 .breadcrumbs a{color:#aaa;text-decoration:none}.breadcrumbs span:before{content:"/";margin-right:5px;color:#4d4d4d}
-.article-and-outline{width:min(1500px,100%);min-width:0;margin:auto;display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:clamp(26px,4vw,50px);padding:clamp(26px,4vw,46px) clamp(22px,5vw,68px) 72px}
-.article{min-width:0;max-width:1020px;outline:0}
+.article-and-outline{width:100%;min-width:0;margin:auto;display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:clamp(26px,4vw,50px);padding:clamp(26px,4vw,46px) clamp(22px,5vw,68px) 72px}
+.article{min-width:0;outline:0}
 .article-body{min-width:0;max-width:100%;color:var(--text);font-size:var(--article-size);overflow-wrap:anywhere}
 .article-title{margin:0 0 6px;color:#fff;font-size:clamp(30px,5vw,46px);line-height:1.08;letter-spacing:-.035em;overflow-wrap:anywhere}
 .article-source{margin:0 0 26px!important;color:#6f6f6f!important;font:14px var(--mono);overflow-wrap:anywhere}

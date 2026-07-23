@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const BUILD = '2026.07.22-min14-1';
+  const BUILD = '2026.07.22-wide-1';
   const MOBILE_BREAKPOINT = 900;
   const RAW_BASE = 'https://raw.githubusercontent.com/RPS-Solutions/aspdnsf-reference-manual/modern-reader/';
   let nextId = 1;
