@@ -96,8 +96,6 @@ Canonical repository:
 
 `https://github.com/RPS-Solutions/aspdnsf-reference-manual`
 
-(Previously published as `i22y/-aspdnsf-offline-manual`; GitHub redirects the old URL.)
-
 ## Registering the manual globally
 
 To have these rules apply when working in *other* RPS repositories, register this local checkout with your agent of choice:
