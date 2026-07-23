@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const BUILD = '2026.07.22-fulltext-2';
+  const BUILD = '2026.07.22-fulltext-3';
   const MOBILE_BREAKPOINT = 900;
   const RAW_BASE = 'https://raw.githubusercontent.com/i22y/-aspdnsf-offline-manual/modern-reader/';
   let nextId = 1;
@@ -258,7 +258,7 @@
     }
     if (position === -1) return '';
 
-    const radius = 80;
+    const radius = 150;
     const start = Math.max(0, position - radius);
     const end = Math.min(text.length, position + matchLength + radius);
     let snippet = text.slice(start, end);

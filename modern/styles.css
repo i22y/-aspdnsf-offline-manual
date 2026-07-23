@@ -50,7 +50,7 @@ button,input{font:inherit} button{color:inherit} a{color:var(--link)}
 .search-help{margin:7px 0 0;color:#737373;font-size:12px;line-height:1.4}
 .search-results{padding:13px 17px;background:#0a0d08;border-bottom:1px solid #28321e}
 .results-heading h2{font-size:14px}.search-results>p{margin:5px 0;color:var(--muted);font:12px var(--mono)}
-.search-results ol{max-height:280px;margin:8px 0 0;padding-left:22px;overflow:auto}
+.search-results ol{max-height:min(62vh,640px);margin:8px 0 0;padding-left:22px;overflow:auto}
 .search-results li{font:13px var(--mono)}.search-results li+li{margin-top:6px}
 .search-results a{color:#c8e68b;text-decoration:none;overflow-wrap:anywhere}
 .result-snippet{margin:3px 0 0;color:var(--muted);font:12px/1.5 var(--mono);overflow-wrap:anywhere}
